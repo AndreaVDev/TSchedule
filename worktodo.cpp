@@ -1,10 +1,11 @@
 #include "worktodo.h"
 
-WorkToDo::WorkToDo(std::string name,std::string description,int duration)
+WorkToDo::WorkToDo(std::string name,std::string description,int duration,std::string timeUnit)
 {
     m_name = name;
     m_description = description;
     m_duration = duration;
+    m_timeUnit = timeUnit;
 }
 
 const std::string &WorkToDo::getName() const
@@ -32,17 +33,27 @@ int WorkToDo::getDuration() const
     return m_duration;
 }
 
-void WorkToDo::setDuration(int newDuration)
+void WorkToDo::setDuration(const int &newDuration)
 {
     m_duration = newDuration;
 }
 
+std::string WorkToDo::getTimeUnit() const
+{
+    return m_timeUnit;
+}
+
+void WorkToDo::setTimeUnit(const std::string &newTimeUnit)
+{
+    m_timeUnit = newTimeUnit;
+}
+
 int WorkToDo::getNumberOfTime() const
 {
-    return numberOfTime;
+    return m_numberOfTime;
 }
 
 void WorkToDo::setNumberOfTime(int newNumberOfTime)
 {
-    numberOfTime = newNumberOfTime;
+    m_numberOfTime = newNumberOfTime;
 }

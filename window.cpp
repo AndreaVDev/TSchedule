@@ -163,7 +163,7 @@ void Window::iconActivated(QSystemTrayIcon::ActivationReason reason)
 void Window::showMessage()
 {
     int numb = durationLabel->text().toInt();
-    WorkToDo workToDo(titleEdit->text().toStdString(),bodyEdit->toPlainText().toStdString(), durationSpinBox->value());
+    WorkToDo workToDo(titleEdit->text().toStdString(),bodyEdit->toPlainText().toStdString(), durationSpinBox->value(),durationSpinBox->suffix().toStdString());
 
     m_action.addMessage(workToDo);
 
