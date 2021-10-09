@@ -21,11 +21,11 @@ private:
     void printDebug(WorkToDo workToDo);
     void checkFile(WorkToDo workToDo);
     bool m_enqueJob;
-    void executeJobSeconds(int numberOfTime,std::string unit);
-    void executeJobHourly(int numberOfTime,std::string unit);
-    void executeJobDaily(int numberOfTime,std::string unit);
-    void executeJobWeekly(int numberOfTime,std::string unit);
-    void executePersonal(int numberOfTime,std::string unit);
+    void executeJobSeconds(int numberOfTime, int duration, std::string executAction);
+    void executeJobHourly(int numberOfTime, int duration, std::string executAction);
+    void executeJobDaily(int numberOfTime, int duration, std::string executAction);
+    void executeJobWeekly(int numberOfTime, int duration, std::string executAction);
+    void executePersonal(int numberOfTime, int duration);
 };
 
 #endif // EXECUTEACTION_H

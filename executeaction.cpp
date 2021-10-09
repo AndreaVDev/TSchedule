@@ -62,22 +62,25 @@ void ExecuteAction::printDebug(WorkToDo workToDo)
         m_enqueJob = false;
     }
 
+
     // holds the number of time the action must be executed
     int numberOfTime = 0;
     // how many time per hour
     if(workToDo.getTimeUnit() == "s")
     {
         numberOfTime = 60 / workToDo.getDuration();
+        executeJobHourly(numberOfTime,workToDo.getDuration(), workToDo.getDescription());
 
     }
     if(workToDo.getTimeUnit() == "h")
     {
         numberOfTime = 24 / workToDo.getDuration();
-
+        executeJobHourly(numberOfTime,workToDo.getDuration(), workToDo.getDescription());
     }
     // how many time per week
     else if (workToDo.getTimeUnit() == "d") {
         numberOfTime = 7 / workToDo.getDuration();
+        executeJobHourly(numberOfTime,workToDo.getDuration(), workToDo.getDescription());
     }
     // custom
     else if(workToDo.getTimeUnit() == "c")
@@ -164,7 +167,7 @@ void ExecuteAction::checkFile(WorkToDo workToDo)
 }
 
 
-void ExecuteAction::executeJobSeconds(int numberOfTime, int duration )
+void ExecuteAction::executeJobSeconds(int numberOfTime, int duration, std::string executAction )
 {
     Timer t;
     t.start();
@@ -175,7 +178,7 @@ void ExecuteAction::executeJobSeconds(int numberOfTime, int duration )
     t.stop();
 }
 
-void ExecuteAction::executeJobHourly(int numberOfTime, int duration)
+void ExecuteAction::executeJobHourly(int numberOfTime, int duration, std::string executAction)
 {
     Timer t;
     t.start();
@@ -187,7 +190,7 @@ void ExecuteAction::executeJobHourly(int numberOfTime, int duration)
 }
 
 // qua passo le ore, ogni quante ore lo voglio fare
-void ExecuteAction::executeJobDaily(int numberOfTime, int duration)
+void ExecuteAction::executeJobDaily(int numberOfTime, int duration, std::string executAction)
 {
     Timer t;
     t.start();
@@ -199,7 +202,7 @@ void ExecuteAction::executeJobDaily(int numberOfTime, int duration)
 }
 
 // qua passo i giorni, ogni quanti giorni lo voglio fare
-void ExecuteAction::executeJobWeekly(int numberOfTime, int duration)
+void ExecuteAction::executeJobWeekly(int numberOfTime, int duration, std::string executAction)
 {
     Timer t;
     t.start();
@@ -210,7 +213,7 @@ void ExecuteAction::executeJobWeekly(int numberOfTime, int duration)
     t.stop();
 }
 
-// qua e' possiible impostarlo personalmente
+// qua e' possiible impostarlo personalmente ogni tot ora alle 12
 void ExecuteAction::executePersonal(int numberOfTime, int duration)
 {
 
