@@ -73,30 +73,31 @@ Window::Window()
 {
 
     m_threadStarted = false;
+    // da rimuovere il parametro int passato a setIcon
+    //setIcon(0);
     createIconGroupBox();
     createMessageGroupBox();
 
-    iconLabel->setMinimumWidth(durationLabel->sizeHint().width());
+    //iconLabel->setMinimumWidth(durationLabel->sizeHint().width());
 
     createActions();
     createTrayIcon();
 
     connect(showMessageButton, &QAbstractButton::clicked, this, &Window::showMessage);
-    connect(showIconCheckBox, &QAbstractButton::toggled, trayIcon, &QSystemTrayIcon::setVisible);
-    connect(iconComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            this, &Window::setIcon);
+    //connect(showIconCheckBox, &QAbstractButton::toggled, trayIcon, &QSystemTrayIcon::setVisible);
+    //connect(iconComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),this, &Window::setIcon);
     connect(trayIcon, &QSystemTrayIcon::messageClicked, this, &Window::messageClicked);
     connect(trayIcon, &QSystemTrayIcon::activated, this, &Window::iconActivated);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->addWidget(iconGroupBox);
+    //mainLayout->addWidget(iconGroupBox);
     mainLayout->addWidget(messageGroupBox);
     setLayout(mainLayout);
 
-    iconComboBox->setCurrentIndex(1);
+    //iconComboBox->setCurrentIndex(1);
     trayIcon->show();
 
-    setWindowTitle(tr("Systray"));
+    setWindowTitle(tr("Task Scheduler"));
     resize(400, 300);
 }
 //! [0]
@@ -134,11 +135,11 @@ void Window::closeEvent(QCloseEvent *event)
 //! [3]
 void Window::setIcon(int index)
 {
-    QIcon icon = iconComboBox->itemIcon(index);
+    QIcon icon = QIcon("C://Users//Andrea Verdura//Documents//TSchedule//images//bad.png");
     trayIcon->setIcon(icon);
-    setWindowIcon(icon);
+    //setWindowIcon(icon);
 
-    trayIcon->setToolTip(iconComboBox->itemText(index));
+    //trayIcon->setToolTip(iconComboBox->itemText(index));
 }
 //! [3]
 
@@ -177,13 +178,11 @@ void Window::showMessage()
         m_threadStarted = true;
     }
 
-    // Aggiungo il lavoro ad una coda che probabilmente sarà nella classe che implementerà il thread
+    //showIconCheckBox->setChecked(true);
+    //int selectedIcon = typeComboBox->itemData(typeComboBox->currentIndex()).toInt();
+    //QSystemTrayIcon::MessageIcon msgIcon = QSystemTrayIcon::MessageIcon(selectedIcon);
 
-    showIconCheckBox->setChecked(true);
-    int selectedIcon = typeComboBox->itemData(typeComboBox->currentIndex()).toInt();
-    QSystemTrayIcon::MessageIcon msgIcon = QSystemTrayIcon::MessageIcon(selectedIcon);
-
-    if (selectedIcon == -1) { // custom icon
+    /*if (selectedIcon == -1) {
         QIcon icon(iconComboBox->itemIcon(iconComboBox->currentIndex()));
         trayIcon->showMessage(titleEdit->text(), bodyEdit->toPlainText(), icon,
                           durationSpinBox->value() * 1000);
@@ -191,6 +190,7 @@ void Window::showMessage()
         trayIcon->showMessage(titleEdit->text(), bodyEdit->toPlainText(), msgIcon,
                           durationSpinBox->value() * 1000);
     }
+    */
 }
 //! [5]
 
@@ -229,7 +229,7 @@ void Window::createMessageGroupBox()
 {
     messageGroupBox = new QGroupBox(tr("Balloon Message"));
 
-    typeLabel = new QLabel(tr("Type:"));
+    /*typeLabel = new QLabel(tr("Type:"));
 
     typeComboBox = new QComboBox;
     typeComboBox->addItem(tr("None"), QSystemTrayIcon::NoIcon);
@@ -245,7 +245,7 @@ void Window::createMessageGroupBox()
     typeComboBox->addItem(QIcon(), tr("Custom icon"),
             -1);
     typeComboBox->setCurrentIndex(1);
-
+    */
     durationLabel = new QLabel(tr("Duration:"));
 
     durationSpinBox = new QSpinBox;
@@ -271,9 +271,9 @@ void Window::createMessageGroupBox()
     showMessageButton->setDefault(true);
 
     QGridLayout *messageLayout = new QGridLayout;
-    messageLayout->addWidget(typeLabel, 0, 0);
-    messageLayout->addWidget(typeComboBox, 0, 1, 1, 2);
-    messageLayout->addWidget(durationLabel, 1, 0);
+    //messageLayout->addWidget(typeLabel, 0, 0);
+    //messageLayout->addWidget(typeComboBox, 0, 1, 1, 2);
+    messageLayout->addWidget(durationLabel, 0, 0);
     messageLayout->addWidget(durationSpinBox, 1, 1);
     messageLayout->addWidget(durationWarningLabel, 1, 2, 1, 3);
     messageLayout->addWidget(titleLabel, 2, 0);
