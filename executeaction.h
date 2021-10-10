@@ -18,14 +18,15 @@ protected:
 private:
     std::vector<WorkToDo> m_jobsList;
     QMutex mutex;
-    void printDebug(WorkToDo workToDo);
-    void checkFile(WorkToDo workToDo);
+    void printDebug();
+    bool checkFile();
     bool m_enqueJob;
-    void executeJobSeconds(int numberOfTime, int duration, std::string executAction);
-    void executeJobHourly(int numberOfTime, int duration, std::string executAction);
-    void executeJobDaily(int numberOfTime, int duration, std::string executAction);
-    void executeJobWeekly(int numberOfTime, int duration, std::string executAction);
+    void executeJobSeconds(int numberOfTime, int duration, std::string executeAction);
+    void executeJobHourly(int numberOfTime, int duration, std::string executeAction);
+    void executeJobDaily(int numberOfTime, int duration, std::string executeAction);
+    void executeJobWeekly(int numberOfTime, int duration, std::string executeAction);
     void executePersonal(int numberOfTime, int duration);
+    void launcJob(WorkToDo);
 };
 
 #endif // EXECUTEACTION_H

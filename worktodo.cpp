@@ -18,12 +18,12 @@ void WorkToDo::setName(const std::string &newName)
     m_name = newName;
 }
 
-const std::string &WorkToDo::getDescription() const
+ std::string WorkToDo::getDescription()
 {
     return m_description;
 }
 
-void WorkToDo::setDescription(const std::string &newDescription)
+void WorkToDo::setDescription( std::string newDescription)
 {
     m_description = newDescription;
 }

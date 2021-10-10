@@ -2,6 +2,7 @@
 #define TIMER_H
 #include <chrono>
 
+// Timer class to handle the duration of the tasks
 class Timer
 {
 public:

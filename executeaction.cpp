@@ -2,10 +2,11 @@
 #include <Timer.h>
 #include <iostream>
 #include <fstream>
+#include <unistd.h>
 
 ExecuteAction::ExecuteAction()
 {
-
+    m_enqueJob = false;
 }
 
 void ExecuteAction::addMessage(WorkToDo workToDo)
@@ -17,206 +18,297 @@ void ExecuteAction::run()
 {
     qDebug() << "RUN";
     //int size = m_jobsList.size();
-    mutex.lock();
 
-    unsigned int jobPos = 0;
     while(true)
     {
-        if(m_jobsList.size() > 0)
-        {
-            // se il job in posizione x i.e. 0 e' un job di stampa
-            if(m_jobsList[jobPos].getDescription() == "P")
-            {
-                // PRINT
-                qDebug() << "RUN CALLING PRINT JOB!";
-                printDebug(m_jobsList[jobPos]);
-                qDebug() << "RUN PRINT JOB QUITTED!";
-            }
-            // se il job in posizione x i.e. 0 e' un job di controllo file
-            else if(m_jobsList[jobPos].getDescription() == "W")
-            {
-                // WRITE TO FILE
-                qDebug() << "RUN CALLING CHECK TEXT JOB!";
 
-                checkFile(m_jobsList[jobPos]);
-                qDebug() << "RUN CHECK TEXT JOB QUITTED!";
-            }
-            jobPos++;
-            // se sforo la dimensione del vettore, riparto da zero
-            if(jobPos > m_jobsList.size())
-            {
-                jobPos = 0;
-            }
+        for(unsigned int i = 0; i < m_jobsList.size(); i++)
+        {
+            qDebug() << "run job desc: " <<            QString::fromUtf8( m_jobsList[i].getDescription().data(), m_jobsList[i].getDescription().size());
+;
+            m_enqueJob = false;
+            launcJob(m_jobsList[i]);
         }
     }
-    mutex.unlock();
 }
 
 
-void ExecuteAction::printDebug(WorkToDo workToDo)
-{
 
+void ExecuteAction::launcJob(WorkToDo workToDo)
+{
+    // if another job must be done i need to go back into the for of the run or I will be executing always the same job
     if(m_enqueJob)
     {
-        qDebug() << "printDebug::JOB WAS EXECUTING, INTERRUPTED PREVIOUS JOB!";
         m_enqueJob = false;
+        return;
     }
-
-
     // holds the number of time the action must be executed
     int numberOfTime = 0;
     // how many time per hour
-    if(workToDo.getTimeUnit() == "s")
+    if(workToDo.getTimeUnit() == " s")
     {
         numberOfTime = 60 / workToDo.getDuration();
         executeJobHourly(numberOfTime,workToDo.getDuration(), workToDo.getDescription());
-
     }
-    if(workToDo.getTimeUnit() == "h")
+    if(workToDo.getTimeUnit() == " h")
     {
         numberOfTime = 24 / workToDo.getDuration();
-        executeJobHourly(numberOfTime,workToDo.getDuration(), workToDo.getDescription());
+        executeJobDaily(numberOfTime,workToDo.getDuration(), workToDo.getDescription());
     }
     // how many time per week
-    else if (workToDo.getTimeUnit() == "d") {
+    else if (workToDo.getTimeUnit() == " d") {
         numberOfTime = 7 / workToDo.getDuration();
-        executeJobHourly(numberOfTime,workToDo.getDuration(), workToDo.getDescription());
+        executeJobWeekly(numberOfTime,workToDo.getDuration(), workToDo.getDescription());
     }
     // custom
-    else if(workToDo.getTimeUnit() == "c")
+    else if(workToDo.getTimeUnit() == " c")
     {
 
     }
+    numberOfTime = 0;
+}
+
+void ExecuteAction::printDebug()
+{
+    qDebug() << "printDebug::Hello, I'm the printing job!";
+}
+
+bool ExecuteAction::checkFile()
+{
+
+    std::string fileName = "test.txt";
+    std::ifstream f(fileName.c_str());
+    return f.good();
+}
 
 
+void ExecuteAction::executeJobSeconds(int numberOfTime, int duration, std::string executeAction )
+{
 
-    // get the number of time
-    qDebug() << "printDebug::JOB MUSTE BE DONE EACH:" << workToDo.getDuration() << " seconds, jobs times in 1 minute: " << numberOfTime;
+
+}
+
+void ExecuteAction::executeJobHourly(int numberOfTime, int duration, std::string executeAction)
+{
+    Timer t;
+    t.start();
 
     for(int i = 0; i < numberOfTime; i++)
     {
         Timer t;
         t.start();
         // da aggiungere funzione per gestire ore minuti giorni mese personalizzato
-        while(t.elapsedSeconds() < workToDo.getDuration())
+        while(t.elapsedSeconds() < duration)
         {
+
             if(m_jobsList.size() > 1)
             {
                 m_enqueJob = true;
-                // per ora aspetto che finisica il job in esecuzione devo modificare affinche se si incrociano cambia
-                if(i == numberOfTime)
-                {
-                    qDebug() << "printDebug::SECOND JOB ADDED TO QUEUE RETURNIG TO RUN!" << i;
-                    return;
-                }
-
             }
         }
         t.stop();
-        qDebug() << "printDebug::Hello, I'm the printing job! Execution number: " << i;
+
+        if(executeAction == "P")
+        {
+            printDebug();
+            if(m_enqueJob)
+            {
+                qDebug() << "executeJobHourly::Second job added to queue! Starting new job";
+                return;
+            }
+        } else if(executeAction == "W")
+        {
+
+            if(checkFile())
+            {
+
+                qDebug() << "executeJobHourly::File exists!";
+            }
+            else
+            {
+
+                qDebug() << "executeJobHourly::File doesn't exist!";
+            }
+            if(m_enqueJob)
+            {
+                qDebug() << "executeJobHourly::Second job added to queue! Starting new job!";
+                return;
+            }
+        } else if(executeAction == "C")
+        {
+            // Custom Action here you can personalize it as you want
+            if(m_enqueJob)
+            {
+                qDebug() << "executeJobHourly::Second job added to queue! Starting new job!";
+                return;
+            }
+        }
     }
 
     if(!m_enqueJob)
     {
-        printDebug(workToDo);
+        executeJobHourly(numberOfTime, duration, executeAction);
     }
 }
 
-void ExecuteAction::checkFile(WorkToDo workToDo)
+// qua passo le ore, ogni quante ore lo voglio fare
+void ExecuteAction::executeJobDaily(int numberOfTime, int duration, std::string executeAction)
 {
-    if(m_enqueJob)
-    {
-        qDebug() << "checkFile::JOB WAS EXECUTING, INTERRUPTED PREVIOUS JOB!";
-        m_enqueJob = false;
-    }
-    // get the number of time
-    int numberOfTime = 60 / workToDo.getDuration();
-    qDebug() << "checkFile::JOB MUSTE BE DONE EACH:" << workToDo.getDuration() << " seconds, jobs times in 1 minute: " << numberOfTime;
+    Timer t;
+    t.start();
 
     for(int i = 0; i < numberOfTime; i++)
     {
         Timer t;
         t.start();
-        while(t.elapsedSeconds() < workToDo.getDuration())
+        // da aggiungere funzione per gestire ore minuti giorni mese personalizzato
+        while(t.elapsedSeconds()*3600 < duration)
         {
+
             if(m_jobsList.size() > 1)
             {
                 m_enqueJob = true;
-                if(i == numberOfTime)
-                {
-                    qDebug() << "checkFile::SECOND JOB ADDED TO QUEUE RETURNIG TO RUN!" << i;
-                    return;
-                }
-
             }
         }
         t.stop();
-        std::ofstream outfile ("test.txt");
 
-        outfile << "File exists and I'm writing in it!" << std::endl;
+        if(executeAction == "P")
+        {
+            printDebug();
+            if(m_enqueJob)
+            {
+                qDebug() << "executeJobDaily::Second job added to queue! Starting new job";
+                return;
+            }
+        } else if(executeAction == "W")
+        {
 
-        outfile.close();
-        qDebug() << "checkFile::FILE CREATED!";
-        qDebug() << "checkFile::Hello, I'm the printing job! Execution number: " << i;
+            if(checkFile())
+            {
+
+                qDebug() << "executeJobDaily::File exists!";
+            }
+            else
+            {
+
+                qDebug() << "executeJobDaily::File doesn't exist!";
+            }
+            if(m_enqueJob)
+            {
+                qDebug() << "executeJobDaily::Second job added to queue! Starting new job!";
+                return;
+            }
+        } else if(executeAction == "C")
+        {
+            // Custom Action here you can personalize it as you want
+            if(m_enqueJob)
+            {
+                qDebug() << "executeJobDaily::Second job added to queue! Starting new job!";
+                return;
+            }
+        }
     }
 
     if(!m_enqueJob)
     {
-        checkFile(workToDo);
+        executeJobDaily(numberOfTime, duration, executeAction);
     }
-}
-
-
-void ExecuteAction::executeJobSeconds(int numberOfTime, int duration, std::string executAction )
-{
-    Timer t;
-    t.start();
-    while(t.elapsedSeconds() < numberOfTime)
-    {
-
-    }
-    t.stop();
-}
-
-void ExecuteAction::executeJobHourly(int numberOfTime, int duration, std::string executAction)
-{
-    Timer t;
-    t.start();
-    while(t.elapsedSeconds() < numberOfTime)
-    {
-
-    }
-    t.stop();
-}
-
-// qua passo le ore, ogni quante ore lo voglio fare
-void ExecuteAction::executeJobDaily(int numberOfTime, int duration, std::string executAction)
-{
-    Timer t;
-    t.start();
-    while(t.elapsedSeconds()*3600 < numberOfTime)
-    {
-
-    }
-    t.stop();
 }
 
 // qua passo i giorni, ogni quanti giorni lo voglio fare
-void ExecuteAction::executeJobWeekly(int numberOfTime, int duration, std::string executAction)
+void ExecuteAction::executeJobWeekly(int numberOfTime, int duration, std::string executeAction)
 {
+
     Timer t;
     t.start();
-    while(t.elapsedSeconds()*86400 < numberOfTime)
-    {
 
+    for(int i = 0; i < numberOfTime; i++)
+    {
+        Timer t;
+        t.start();
+        // da aggiungere funzione per gestire ore minuti giorni mese personalizzato
+        while(t.elapsedSeconds()*86400 < duration)
+        {
+
+            if(m_jobsList.size() > 1)
+            {
+                m_enqueJob = true;
+            }
+        }
+        t.stop();
+
+        if(executeAction == "P")
+        {
+            printDebug();
+            if(m_enqueJob)
+            {
+                qDebug() << "executeJobWeekly::Second job added to queue! Starting new job";
+                return;
+            }
+        } else if(executeAction == "W")
+        {
+
+            if(checkFile())
+            {
+
+                qDebug() << "executeJobWeekly::File exists!";
+            }
+            else
+            {
+
+                qDebug() << "executeJobWeekly::File doesn't exist!";
+            }
+            if(m_enqueJob)
+            {
+                qDebug() << "executeJobWeekly::Second job added to queue! Starting new job!";
+                return;
+            }
+        } else if(executeAction == "C")
+        {
+            // Custom Action here you can personalize it as you want
+            if(m_enqueJob)
+            {
+                qDebug() << "executeJobWeekly::Second job added to queue! Starting new job!";
+                return;
+            }
+        }
     }
-    t.stop();
+
+    if(!m_enqueJob)
+    {
+        executeJobWeekly(numberOfTime, duration, executeAction);
+    }
 }
 
 // qua e' possiible impostarlo personalmente ogni tot ora alle 12
 void ExecuteAction::executePersonal(int numberOfTime, int duration)
 {
+    Timer t;
+    t.start();
+    int executionNumber = 0;
+    while(t.elapsedSeconds()*86400 < duration)
+    {
+        if(m_jobsList.size() > 1)
+        {
+            m_enqueJob = true;
+            // I wait for the jobs to execute the n-th number of time
+            /*
+            if(i == numberOfTime)
+            {
+                qDebug() << "printDebug::SECOND JOB ADDED TO QUEUE RETURNIG TO RUN!" << i;
+                return;
+            }
+            */
+        }
+    }
+    t.stop();
 
+    executionNumber++;
+    if(m_enqueJob)
+    {
+        return;
+    }
+    t.stop();
 }
 
 

@@ -163,7 +163,11 @@ void Window::iconActivated(QSystemTrayIcon::ActivationReason reason)
 void Window::showMessage()
 {
     int numb = durationLabel->text().toInt();
-    WorkToDo workToDo(titleEdit->text().toStdString(),bodyEdit->toPlainText().toStdString(), durationSpinBox->value(),durationSpinBox->suffix().toStdString());
+    QString suffix = durationSpinBox->suffix();
+    std::string strSuffix = suffix.toStdString();
+    qDebug() << "Window::showMessage suffix: " << suffix;
+
+    WorkToDo workToDo(titleEdit->text().toStdString(),bodyEdit->toPlainText().toStdString(), durationSpinBox->value(),strSuffix);
 
     m_action.addMessage(workToDo);
 
@@ -245,9 +249,9 @@ void Window::createMessageGroupBox()
     durationLabel = new QLabel(tr("Duration:"));
 
     durationSpinBox = new QSpinBox;
-    durationSpinBox->setRange(5, 60);
+    durationSpinBox->setRange(1, 60);
     durationSpinBox->setSuffix(" s");
-    durationSpinBox->setValue(15);
+    durationSpinBox->setValue(1);
 
     durationWarningLabel = new QLabel(tr("(some systems might ignore this "
                                          "hint)"));
