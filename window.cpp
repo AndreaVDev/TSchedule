@@ -74,18 +74,16 @@ Window::Window()
 
     m_threadStarted = false;
     // da rimuovere il parametro int passato a setIcon
-    //setIcon(0);
     createIconGroupBox();
     createMessageGroupBox();
 
-    //iconLabel->setMinimumWidth(durationLabel->sizeHint().width());
 
     createActions();
     createTrayIcon();
+    setIcon(0);
+
 
     connect(showMessageButton, &QAbstractButton::clicked, this, &Window::showMessage);
-    //connect(showIconCheckBox, &QAbstractButton::toggled, trayIcon, &QSystemTrayIcon::setVisible);
-    //connect(iconComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),this, &Window::setIcon);
     connect(trayIcon, &QSystemTrayIcon::messageClicked, this, &Window::messageClicked);
     connect(trayIcon, &QSystemTrayIcon::activated, this, &Window::iconActivated);
 
@@ -94,7 +92,6 @@ Window::Window()
     mainLayout->addWidget(messageGroupBox);
     setLayout(mainLayout);
 
-    //iconComboBox->setCurrentIndex(1);
     trayIcon->show();
 
     setWindowTitle(tr("Task Scheduler"));
@@ -137,9 +134,7 @@ void Window::setIcon(int index)
 {
     QIcon icon = QIcon("C://Users//Andrea Verdura//Documents//TSchedule//images//bad.png");
     trayIcon->setIcon(icon);
-    //setWindowIcon(icon);
-
-    //trayIcon->setToolTip(iconComboBox->itemText(index));
+    setWindowIcon(icon);
 }
 //! [3]
 
@@ -149,7 +144,7 @@ void Window::iconActivated(QSystemTrayIcon::ActivationReason reason)
     switch (reason) {
     case QSystemTrayIcon::Trigger:
     case QSystemTrayIcon::DoubleClick:
-        iconComboBox->setCurrentIndex((iconComboBox->currentIndex() + 1) % iconComboBox->count());
+        //iconComboBox->setCurrentIndex((iconComboBox->currentIndex() + 1) % iconComboBox->count());
         break;
     case QSystemTrayIcon::MiddleClick:
         showMessage();
@@ -163,7 +158,6 @@ void Window::iconActivated(QSystemTrayIcon::ActivationReason reason)
 //! [5]
 void Window::showMessage()
 {
-    int numb = durationLabel->text().toInt();
     QString suffix = durationSpinBox->suffix();
     std::string strSuffix = suffix.toStdString();
     qDebug() << "Window::showMessage suffix: " << suffix;
@@ -178,19 +172,7 @@ void Window::showMessage()
         m_threadStarted = true;
     }
 
-    //showIconCheckBox->setChecked(true);
-    //int selectedIcon = typeComboBox->itemData(typeComboBox->currentIndex()).toInt();
-    //QSystemTrayIcon::MessageIcon msgIcon = QSystemTrayIcon::MessageIcon(selectedIcon);
-
-    /*if (selectedIcon == -1) {
-        QIcon icon(iconComboBox->itemIcon(iconComboBox->currentIndex()));
-        trayIcon->showMessage(titleEdit->text(), bodyEdit->toPlainText(), icon,
-                          durationSpinBox->value() * 1000);
-    } else {
-        trayIcon->showMessage(titleEdit->text(), bodyEdit->toPlainText(), msgIcon,
-                          durationSpinBox->value() * 1000);
-    }
-    */
+    QSystemTrayIcon::MessageIcon msgIcon = QSystemTrayIcon::MessageIcon();
 }
 //! [5]
 
@@ -229,23 +211,6 @@ void Window::createMessageGroupBox()
 {
     messageGroupBox = new QGroupBox(tr("Balloon Message"));
 
-    /*typeLabel = new QLabel(tr("Type:"));
-
-    typeComboBox = new QComboBox;
-    typeComboBox->addItem(tr("None"), QSystemTrayIcon::NoIcon);
-    typeComboBox->addItem(style()->standardIcon(
-            QStyle::SP_MessageBoxInformation), tr("Information"),
-            QSystemTrayIcon::Information);
-    typeComboBox->addItem(style()->standardIcon(
-            QStyle::SP_MessageBoxWarning), tr("Warning"),
-            QSystemTrayIcon::Warning);
-    typeComboBox->addItem(style()->standardIcon(
-            QStyle::SP_MessageBoxCritical), tr("Critical"),
-            QSystemTrayIcon::Critical);
-    typeComboBox->addItem(QIcon(), tr("Custom icon"),
-            -1);
-    typeComboBox->setCurrentIndex(1);
-    */
     durationLabel = new QLabel(tr("Duration:"));
 
     durationSpinBox = new QSpinBox;
