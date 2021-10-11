@@ -67,23 +67,22 @@
 #include <QVBoxLayout>
 #include <QMessageBox>
 #include <worktodo.h>
+#include <QTime>
 
-//! [0]
 Window::Window()
 {
 
     m_threadStarted = false;
-    // da rimuovere il parametro int passato a setIcon
-    createIconGroupBox();
+
     createMessageGroupBox();
-
-
     createActions();
     createTrayIcon();
-    setIcon(0);
+    setIcon();
 
 
     connect(showMessageButton, &QAbstractButton::clicked, this, &Window::showMessage);
+    connect(customTimeScheduleButton, &QAbstractButton::clicked, this, &Window::addCustomTaskSchedule);
+
     connect(trayIcon, &QSystemTrayIcon::messageClicked, this, &Window::messageClicked);
     connect(trayIcon, &QSystemTrayIcon::activated, this, &Window::iconActivated);
 
@@ -97,9 +96,7 @@ Window::Window()
     setWindowTitle(tr("Task Scheduler"));
     resize(400, 300);
 }
-//! [0]
 
-//! [1]
 void Window::setVisible(bool visible)
 {
     minimizeAction->setEnabled(visible);
@@ -107,9 +104,7 @@ void Window::setVisible(bool visible)
     restoreAction->setEnabled(isMaximized() || !visible);
     QDialog::setVisible(visible);
 }
-//! [1]
 
-//! [2]
 void Window::closeEvent(QCloseEvent *event)
 {
 #ifdef Q_OS_MACOS
@@ -127,18 +122,14 @@ void Window::closeEvent(QCloseEvent *event)
         event->ignore();
     }
 }
-//! [2]
 
-//! [3]
-void Window::setIcon(int index)
+void Window::setIcon()
 {
-    QIcon icon = QIcon("C://Users//Andrea Verdura//Documents//TSchedule//images//bad.png");
+    QIcon icon = QIcon(":/images/bad.png");
     trayIcon->setIcon(icon);
     setWindowIcon(icon);
 }
-//! [3]
 
-//! [4]
 void Window::iconActivated(QSystemTrayIcon::ActivationReason reason)
 {
     switch (reason) {
@@ -153,9 +144,7 @@ void Window::iconActivated(QSystemTrayIcon::ActivationReason reason)
         ;
     }
 }
-//! [4]
 
-//! [5]
 void Window::showMessage()
 {
     QString suffix = durationSpinBox->suffix();
@@ -172,44 +161,29 @@ void Window::showMessage()
         m_threadStarted = true;
     }
 
-    QSystemTrayIcon::MessageIcon msgIcon = QSystemTrayIcon::MessageIcon();
 }
-//! [5]
 
-//! [6]
+void Window::addCustomTaskSchedule()
+{
+
+    QTime scheduleHour(14, 0, 0);
+    WorkToDo workToDo("test task","P", "Monday",scheduleHour);
+
+    m_action.addMessage(workToDo);
+}
+
 void Window::messageClicked()
 {
     QMessageBox::information(nullptr, tr("Systray"),
                              tr("Sorry, I already gave what help I could.\n"
                                 "Maybe you should try asking a human?"));
 }
-//! [6]
 
-void Window::createIconGroupBox()
-{
-    iconGroupBox = new QGroupBox(tr("Tray Icon"));
 
-    iconLabel = new QLabel("Icon:");
-
-    iconComboBox = new QComboBox;
-    iconComboBox->addItem(QIcon(":/images/bad.png"), tr("Bad"));
-    iconComboBox->addItem(QIcon(":/images/heart.png"), tr("Heart"));
-    iconComboBox->addItem(QIcon(":/images/trash.png"), tr("Trash"));
-
-    showIconCheckBox = new QCheckBox(tr("Show icon"));
-    showIconCheckBox->setChecked(true);
-
-    QHBoxLayout *iconLayout = new QHBoxLayout;
-    iconLayout->addWidget(iconLabel);
-    iconLayout->addWidget(iconComboBox);
-    iconLayout->addStretch();
-    iconLayout->addWidget(showIconCheckBox);
-    iconGroupBox->setLayout(iconLayout);
-}
 
 void Window::createMessageGroupBox()
 {
-    messageGroupBox = new QGroupBox(tr("Balloon Message"));
+    messageGroupBox = new QGroupBox(tr("Task info"));
 
     durationLabel = new QLabel(tr("Duration:"));
 
@@ -218,26 +192,23 @@ void Window::createMessageGroupBox()
     durationSpinBox->setSuffix(" s");
     durationSpinBox->setValue(1);
 
-    durationWarningLabel = new QLabel(tr("(some systems might ignore this "
-                                         "hint)"));
+    durationWarningLabel = new QLabel(tr("(s for seconds, h for hours, d for days)"));
     durationWarningLabel->setIndent(10);
 
-    titleLabel = new QLabel(tr("Title:"));
+    titleLabel = new QLabel(tr("Task Title:"));
 
-    titleEdit = new QLineEdit(tr("Cannot connect to network"));
+    titleEdit = new QLineEdit(tr(""));
 
-    bodyLabel = new QLabel(tr("Body:"));
+    bodyLabel = new QLabel(tr("Task Action:"));
 
     bodyEdit = new QTextEdit;
-    bodyEdit->setPlainText(tr("Don't believe me. Honestly, I don't have a "
-                              "clue.\nClick this balloon for details."));
+    bodyEdit->setPlainText(tr(""));
 
-    showMessageButton = new QPushButton(tr("Show Message"));
+    showMessageButton = new QPushButton(tr("Add Task"));
     showMessageButton->setDefault(true);
+    customTimeScheduleButton = new QPushButton(tr("Custom schedule"));
 
     QGridLayout *messageLayout = new QGridLayout;
-    //messageLayout->addWidget(typeLabel, 0, 0);
-    //messageLayout->addWidget(typeComboBox, 0, 1, 1, 2);
     messageLayout->addWidget(durationLabel, 0, 0);
     messageLayout->addWidget(durationSpinBox, 1, 1);
     messageLayout->addWidget(durationWarningLabel, 1, 2, 1, 3);
@@ -246,6 +217,7 @@ void Window::createMessageGroupBox()
     messageLayout->addWidget(bodyLabel, 3, 0);
     messageLayout->addWidget(bodyEdit, 3, 1, 2, 4);
     messageLayout->addWidget(showMessageButton, 5, 4);
+    messageLayout->addWidget(customTimeScheduleButton, 5,3);
     messageLayout->setColumnStretch(3, 1);
     messageLayout->setRowStretch(4, 1);
     messageGroupBox->setLayout(messageLayout);

@@ -85,13 +85,13 @@ protected:
     void closeEvent(QCloseEvent *event) override;
 
 private slots:
-    void setIcon(int index);
+    void setIcon();
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
     void showMessage();
+    void addCustomTaskSchedule();
     void messageClicked();
 
 private:
-    void createIconGroupBox();
     void createMessageGroupBox();
     void createActions();
     void createTrayIcon();
@@ -112,6 +112,8 @@ private:
     QLineEdit *titleEdit;
     QTextEdit *bodyEdit;
     QPushButton *showMessageButton;
+    QPushButton *customTimeScheduleButton;
+
 
     QAction *minimizeAction;
     QAction *maximizeAction;

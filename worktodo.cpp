@@ -8,52 +8,71 @@ WorkToDo::WorkToDo(std::string name,std::string description,int duration,std::st
     m_timeUnit = timeUnit;
 }
 
-const std::string &WorkToDo::getName() const
+WorkToDo::WorkToDo(std::string name, std::string description, std::string day, QTime time)
+{
+    m_name = name;
+    m_description = description;
+    m_day = day;
+    m_time = time;
+}
+
+std::string WorkToDo::getName()
 {
     return m_name;
 }
 
-void WorkToDo::setName(const std::string &newName)
+void WorkToDo::setName( std::string newName)
 {
     m_name = newName;
 }
 
- std::string WorkToDo::getDescription()
+std::string WorkToDo::getDescription()
 {
     return m_description;
 }
 
-void WorkToDo::setDescription( std::string newDescription)
+void WorkToDo::setDescription(std::string newDescription)
 {
     m_description = newDescription;
 }
 
-int WorkToDo::getDuration() const
+int WorkToDo::getDuration()
 {
     return m_duration;
 }
 
-void WorkToDo::setDuration(const int &newDuration)
+void WorkToDo::setDuration(int newDuration)
 {
     m_duration = newDuration;
 }
 
-std::string WorkToDo::getTimeUnit() const
+std::string WorkToDo::getTimeUnit()
 {
     return m_timeUnit;
 }
 
-void WorkToDo::setTimeUnit(const std::string &newTimeUnit)
+void WorkToDo::setTimeUnit( std::string newTimeUnit)
 {
     m_timeUnit = newTimeUnit;
 }
 
-int WorkToDo::getNumberOfTime() const
+std::string WorkToDo::getDay()
 {
-    return m_numberOfTime;
+    return m_day;
 }
 
-void WorkToDo::setNumberOfTime(int newNumberOfTime)
+void WorkToDo::setDay(std::string day)
 {
-    m_numberOfTime = newNumberOfTime;
+    m_day = day;
 }
+
+QTime WorkToDo::getTime()
+{
+    return m_time;
+}
+
+void WorkToDo::setTime(QTime time)
+{
+    m_time = time;
+}
+
